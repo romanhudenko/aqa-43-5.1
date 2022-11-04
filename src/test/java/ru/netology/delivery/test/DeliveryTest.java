@@ -28,11 +28,6 @@ class DeliveryTest {
         var daysToAddForSecondMeeting = 7;
         String secondMeetingDate = DataGenerator.generateDate(daysToAddForSecondMeeting);
         DataGenerator.UserInfo userInfo = DataGenerator.Registration.generateUser("ru");
-        // TODO: добавить логику теста в рамках которого будет выполнено планирование и перепланирование встречи.
-        // Для заполнения полей формы можно использовать пользователя validUser и строки с датами в переменных
-        // firstMeetingDate и secondMeetingDate. Можно также вызывать методы generateCity(locale),
-        // generateName(locale), generatePhone(locale) для генерации и получения в тесте соответственно города,
-        // имени и номера телефона без создания пользователя в методе generateUser(String locale) в датагенераторе
         $("[data-test-id=\"city\"] input").sendKeys(userInfo.getCity());
         $("[data-test-id='date'] input").sendKeys(Keys.chord(Keys.SHIFT, Keys.HOME), Keys.BACK_SPACE);
         $("[data-test-id=\"date\"] input").sendKeys(planningDate);
@@ -56,7 +51,7 @@ class DeliveryTest {
     @DisplayName("Should raise error about wrong city")
     public void wrongCity() {
         DataGenerator.UserInfo userInfo = DataGenerator.Registration.generateUser("ru");
-        $("[data-test-id=\"city\"] input").sendKeys("Неизвестность");
+        $("[data-test-id=\"city\"] input").sendKeys(DataGenerator.generateNonRussianCity());
         $("[data-test-id='date'] input").sendKeys(Keys.chord(Keys.SHIFT, Keys.HOME), Keys.BACK_SPACE);
         String planningDate = DataGenerator.generateDate(4);
         $("[data-test-id=\"date\"] input").sendKeys(planningDate);
@@ -83,37 +78,6 @@ class DeliveryTest {
     }
 
     @Test
-    @DisplayName("Should raise error about wrong delivery date")
-    public void wrongDate() {
-        DataGenerator.UserInfo userInfo = DataGenerator.Registration.generateUser("ru");
-        $("[data-test-id=\"city\"] input").sendKeys(userInfo.getCity());
-        $("[data-test-id='date'] input").sendKeys(Keys.chord(Keys.SHIFT, Keys.HOME), Keys.BACK_SPACE);
-        $("[data-test-id=\"date\"] input").sendKeys("33.33.3333");
-        $("[data-test-id=\"name\"] input").sendKeys(userInfo.getName());
-        $("[data-test-id=\"phone\"] span span input").sendKeys(userInfo.getPhone());
-        $("[data-test-id=\"agreement\"]").click();
-        $x("//*[contains(text(),'Запланировать')]").click();
-        $x("//*[contains(text(),'Неверно введена дата')]").shouldBe(visible);
-    }
-
-    @Test
-    @DisplayName("Should allow to plan meeting with unusual name")
-    public void positiveNameMinus() {
-        DataGenerator.UserInfo userInfo = DataGenerator.Registration.generateUser("ru");
-        $("[data-test-id=\"city\"] input").sendKeys(userInfo.getCity());
-        $("[data-test-id='date'] input").sendKeys(Keys.chord(Keys.SHIFT, Keys.HOME), Keys.BACK_SPACE);
-        String planningDate = DataGenerator.generateDate(4);
-        $("[data-test-id=\"date\"] input").sendKeys(planningDate);
-        $("[data-test-id=\"name\"] input").sendKeys("Мак-Кинли Иван");
-        $("[data-test-id=\"phone\"] span span input").sendKeys(userInfo.getPhone());
-        $("[data-test-id=\"agreement\"]").click();
-        $x("//*[contains(text(),'Запланировать')]").click();
-        $(".notification__content")
-                .shouldHave(text("Встреча успешно запланирована на " + planningDate), Duration.ofSeconds(15))
-                .shouldBe(visible);
-    }
-
-    @Test
     @DisplayName("Should forbid to plan meeting with incorrect name")
     public void wrongName() {
         DataGenerator.UserInfo userInfo = DataGenerator.Registration.generateUser("ru");
@@ -121,7 +85,7 @@ class DeliveryTest {
         $("[data-test-id='date'] input").sendKeys(Keys.chord(Keys.SHIFT, Keys.HOME), Keys.BACK_SPACE);
         String planningDate = DataGenerator.generateDate(4);
         $("[data-test-id=\"date\"] input").sendKeys(planningDate);
-        $("[data-test-id=\"name\"] input").sendKeys("Qwerty John");
+        $("[data-test-id=\"name\"] input").sendKeys(DataGenerator.generateNonRussianName());
         $("[data-test-id=\"phone\"] span span input").sendKeys(userInfo.getPhone());
         $("[data-test-id=\"agreement\"]").click();
         $x("//*[contains(text(),'Запланировать')]").click();
